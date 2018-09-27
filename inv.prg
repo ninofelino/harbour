@@ -1,7 +1,7 @@
 memvar spl
 m->spl:={}
 cls
-set defa to "/home/server"
+set defa to "/home/server/posserver/ics/DAT"
 use SUP.DBF shared new
 //dbedit()
 select SUP
