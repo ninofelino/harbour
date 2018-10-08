@@ -1,5 +1,7 @@
 import psycopg2
-conn = psycopg2.connect("host='localhost' dbname='odoo' user='postgres' password='novellina'")
+#conn = psycopg2.connect("host='localhost' dbname='admin' user='postgres' password='novellina'")
+conn = psycopg2.connect("host='192.168.1.36' dbname='odoo' user='postgres' password='odo'")
+
 cursor=conn.cursor()
 from dbfread import DBF
 #table res_partner
