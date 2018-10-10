@@ -5,7 +5,7 @@ import datetime
 conn = psycopg2.connect("host='192.168.1.36' dbname='odoo' user='postgres' password='odo'")
 cursor=conn.cursor()
 datakosong =0
-listOfUkuran=['32','33','34','35','36','37','38','39','40','41','42','43','44','45']
+listOfUkuran=['2','3','4','5','6','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45']
 from dbfread import DBF
 # for record in DBF('/home/server/Downloads/INV-HO.DBF',encoding='iso-8859-1'):
    # print(record)
