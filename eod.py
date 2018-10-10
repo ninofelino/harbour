@@ -5,6 +5,7 @@ import datetime
 conn = psycopg2.connect("host='192.168.1.36' dbname='odoo' user='postgres' password='odo'")
 cursor=conn.cursor()
 datakosong =0
+listOfUkuran=['32','33','34','35','36','37','38','39','40','41','42','43','44','45']
 from dbfread import DBF
 # for record in DBF('/home/server/Downloads/INV-HO.DBF',encoding='iso-8859-1'):
    # print(record)
@@ -13,9 +14,18 @@ for item in DBF('/home/server/Downloads/INV-HO.DBF',encoding='iso-8859-1'):
      #  print  list(item.values())
      # print len(item),
      # print item['CODE'],item['DESC1'],item['LQOH']
+      
       list=item['DESC1'].split(" ")
       print list[len(list)-1]
       ukuran=list[len(list)-1][-2:]
+      if ukuran in listOfUkuran :
+         print ukuran    
+         article=item['DESC1'].replace(ukuran,"").replace("'","")
+      else:
+         ukuran=""     
+         print "AllSize"         
+         article=item['DESC1'].replace("'","")
+      
       tglterima = datetime.datetime.now()
       awalterima ="NULL"
       if item['FIRSTRCV'] is None:
@@ -40,7 +50,7 @@ for item in DBF('/home/server/Downloads/INV-HO.DBF',encoding='iso-8859-1'):
          +" ,lqoh="+str(item['LQOH'])\
          +",lastrcv="+tglterima \
          +",firstrcv="+awalterima \
-         +",ukuran='"+ukuran+"'"         
+         +",ukuran='"+ukuran+"'"+",article='"+article+"'"      
          cursor.execute(statement)
          conn.commit() 
       
