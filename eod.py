@@ -1,15 +1,15 @@
 
 import psycopg2
 import datetime
-#conn = psycopg2.connect("host='localhost' dbname='admin' user='postgres' password='novellina'")
-conn = psycopg2.connect("host='192.168.1.27' dbname='odoo' user='postgres' password='novellina'")
+conn = psycopg2.connect("host='localhost' dbname='odoo' user='postgres' password='odoo'")
+#conn = psycopg2.connect("host='192.168.1.27' dbname='odoo' user='postgres' password='novellina'")
 cursor=conn.cursor()
 datakosong =0
 listOfUkuran=['2','3','4','5','6','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45']
 from dbfread import DBF
-# for record in DBF('/home/server/Downloads/INV-HO.DBF',encoding='iso-8859-1'):
+# for record in DBF('/mnt/poserver/ICS/INV.DBF',encoding='iso-8859-1'):
    # print(record)
-for item in DBF('/mnt/share/ics/DAT/INV.DBF',encoding='iso-8859-1'):
+for item in DBF('/mnt/poserver/ics/DAT/INV.DBF',encoding='iso-8859-1'):
      #  print item[1]  
      #  print  list(item.values())
      # print len(item),
@@ -69,9 +69,9 @@ for item in DBF('/mnt/share/ics/DAT/INV.DBF',encoding='iso-8859-1'):
       if item['CODE'].strip()=="":  
               print "Null" 
       else:
-             cursor.execute(statement)
-             conn.commit() 
-      #print statement
+             #cursor.execute(statement)
+             #conn.commit() 
+          print statement
       statement = " INSERT INTO product_product(id,product_tmpl_id,active,barcode,create_uid,write_uid)"\
       +" values('"+item['CODE']+"',"+item['CODE']+",True,"+item['CODE']+",1,1) ON CONFLICT ON CONSTRAINT product_product_pkey DO UPDATE SET barcode='"+item['CODE']+"',default_code='"+item['CODE']+"';"
      
@@ -79,8 +79,8 @@ for item in DBF('/mnt/share/ics/DAT/INV.DBF',encoding='iso-8859-1'):
       if item['CODE'].strip()=="":
          print "Null"
       else:
-         cursor.execute(statement)
-         conn.commit() 
-
+         #cursor.execute(statement)
+         #conn.commit() 
+          print "x"   
 print "Data LastRcv kosong:"
 print datakosong     
