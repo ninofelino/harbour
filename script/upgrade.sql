@@ -1,9 +1,4 @@
-- View: public.invvariant
-
--- DROP VIEW public.invvariant;
-
-CREATE OR REPLACE VIEW public.invvariant AS 
- SELECT min(inv.barcode::text) AS key,
+SELECT min(inv.barcode::text) AS key,max(mclass) as mclass,
     count(*) AS count,
     inv.article,
     array_agg(inv.ukuran) AS ukuran,
@@ -12,10 +7,6 @@ CREATE OR REPLACE VIEW public.invvariant AS
     round(avg(inv.modal), 0) AS modal,
     round(avg(inv.hargajual), 0) AS hargajual,
     min(inv.lastrcv) AS lastrcv,
-    min(inv.firstrcv) AS firstrcv,
-    max(mclass) AS mclass
+    min(inv.firstrcv) AS firstrcv
    FROM inv
   GROUP BY inv.article;
-
-ALTER TABLE public.invvariant
-  OWNER TO postgres;

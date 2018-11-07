@@ -6,12 +6,11 @@ cursor.execute("""SELECT * from invvariant""")
 rows = cursor.fetchall()
 for row in rows:
     print "   ", row[0]
-    statement=" Insert into product_template(id,name,sequence,type,categ_id,uom_id,uom_po_id,responsible_id,tracking,purchase_line_warn,sale_delay,active) "\
-    +" values("+row[0]+",'"+row[2]+"',0,'consu',1,1,1,1,'none','no-message',1,True) "\
-    +" ON CONFLICT ON CONSTRAINT product_template_pkey DO UPDATE SET active=True,purchase_ok=True,list_price="+str(row[7])+";"
+    statement=" Insert into product_template(id,name,sequence,type,categ_id,uom_id,uom_po_id,responsible_id,tracking,purchase_line_warn,sale_delay,active,sale_ok,available_in_pos) "\
+    +" values("+row[0]+",'"+row[2]+"',0,'consu',1,1,1,1,'none','no-message',1,True,True,True) "\
+    +" ON CONFLICT ON CONSTRAINT product_template_pkey DO UPDATE SET active=True,purchase_ok=True,list_price="+str(row[7])+",sale_ok=True,available_in_pos=True,categ_id=mclass('"+row[10]+"');"
     print row[7]
-    #print statement
-
+    
     cursor.execute(statement)
     conn.commit() 
     jml = row[1]
@@ -26,9 +25,7 @@ for row in rows:
        #print statement
        #cursor.execute(statement)
        #conn.commit() 
-      
-       #print statement
-  
+    
 cursor.execute("""SELECT * from invproduct_product""")
 rows = cursor.fetchall()
 for row in rows:     
