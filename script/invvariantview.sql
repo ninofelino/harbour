@@ -1,4 +1,4 @@
-- View: public.invvariant
+-- View: public.invvariant
 
 -- DROP VIEW public.invvariant;
 

@@ -1,3 +1,4 @@
+!
 update product_template set active=true
 sudo apt install python-pip
 pip install psycopg2
