@@ -1,4 +1,5 @@
 update product_template set active=true
+sudo apt install python-pip
 pip install psycopg2
 pip install dbfread
 git config --global user.email "tutyfelino@gmail.com"
