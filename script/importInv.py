@@ -71,8 +71,12 @@ def importodoo():
         print "   ", row[0]
         statement=" Insert into product_template(id,name,sequence,type,categ_id,uom_id,uom_po_id,responsible_id,tracking,sale_delay,active) "\
         +" values("+row[0]+",'"+row[2]+"',0,'consu',1,1,1,1,'no-message',1,True) "\
-        +" ON CONFLICT ON CONSTRAINT product_template_pkey DO UPDATE SET active=True,purchase_ok=True,list_price="+str(row[7])+",sale_ok=True,categ_id=mclass('"+row[10]+"');"
+        +" ON CONFLICT ON CONSTRAINT product_template_pkey DO UPDATE SET tracking='"+"none"+"'active=True,purchase_ok=True,list_price="+str(row[7])+",sale_ok=True,categ_id=mclass('"+row[10]+"');"
         print row[7]
+        cursor.execute(statement)
+        conn.commit() 
+        statement=" Insert into product_attribute_line(id,product_tmpl_id,attribute_id)"\
+        +" values("+row[0]+","+row[0]+",1)"
         cursor.execute(statement)
         conn.commit() 
 
@@ -80,27 +84,58 @@ def productvariant():
     print "Product Variant"
     cursor.execute("""SELECT * from invproduct_product""")
     rows = cursor.fetchall()
+    x=0
     for row in rows:     
         #print row[0]
         statement=" Insert into Product_product(id,product_tmpl_id,barcode,default_code,active) "\
         +" values("+row[0]+","+row[1]+",'"+row[0]+"','"+row[0]+"',True)"\
         +" ON CONFLICT ON CONSTRAINT product_product_pkey DO UPDATE SET active=True,default_code='"+row[0]+"'"+",barcode='"+row[0]+"'"
-        cursor.execute(statement)
-        conn.commit() 
-    
+        try:
+            cursor.execute(statement)
+            conn.commit() 
+        except psycopg2.DatabaseError as error:
+             print(error)
+             conn.rollback()
+        finally:
+             print "end"     
+                 
+        x=x+1
+        statement="insert into product_attribute_line(id,product_tmpl_id,attribute_id) values("\
+        +row[0]+","+row[0]+",1)"\
+        +" ON CONFLICT ON CONSTRAINT product_attribute_line_pkey DO NOTHING"
+        
+        try:
+           cursor.execute(statement)
+           conn.commit()
+        except psycopg2.DatabaseError as error:
+               print(error)
+               conn.rollback()
+        finally:
+               print "end" 
+              
         statement="INSERT INTO product_attribute_line_product_attribute_value_rel("\
         +"product_attribute_line_id, product_attribute_value_id) VALUES("\
-        +row[0]+",1) ON CONFLICT ON CONSTRAINT product_attribute_line_product_a_product_attribute_line_id_fkey DO NOTHING;"
+        +row[0]+","+str(x)+")"
+        # +" ON CONFLICT ON CONSTRAINT product_attribute_line_product_a_product_attribute_line_id_fkey DO NOTHING;"
         print statement
-    
+        print x
+        if x>5 : 
+           x=0 
         #cursor.execute(statement)
         #conn.commit()
+        try:
+           cursor.execute(statement)
+           conn.commit()
+        except psycopg2.DatabaseError as error:
+               print(error)
+               #conn.rollback()
+        finally:
+               print "end"  
 
 
 
-
-
+depstore()
 productvariant()
-importodoo()    
-depstore()        
-mclass()
+#importodoo()    
+        
+#mclass()
