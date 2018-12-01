@@ -88,6 +88,7 @@ def importodoo():
 
 def productvariant():
     print "Product Variant"
+    con = engine.connect() 
     cursor.execute("""SELECT * from invproduct_product order by 2,1""")
     rows = cursor.fetchall()
     x=0
@@ -96,31 +97,28 @@ def productvariant():
         #print row[0]
         statement=" Insert into Product_product(id,product_tmpl_id,barcode,default_code,active) "\
         +" values("+row[0]+","+row[1]+",'"+row[0]+"','"+row[0]+"',True)"\
-        +" ON CONFLICT ON CONSTRAINT product_product_pkey DO UPDATE SET active=True,default_code='"+row[0]+"'"+",barcode='"+row[0]+"'"
+        +" ON CONFLICT ON CONSTRAINT product_product_pkey DO UPDATE SET write_date='2018-12-01 07:52:30.281056',create_date='2018-12-01 07:52:30.281056',create_uid=1,write_uid=1,active=True,default_code='"+row[0]+"'"+",barcode='"+row[0]+"'"
         x=x+1
         if x>5 : 
            x=1 
-        try:    
+        try:
            cursor.execute(statement)
-           conn.commit() 
+           conn.commit()
         except:
-               print "err product"
+           print statement    
+           
+       
               
-        statement="INSERT INTO product_attribute_line_product_attribute_value_rel("\
-        +"product_attribute_line_id, product_attribute_value_id) VALUES("\
-        +row[1]+","+str(x)+")"
-        # +" ON CONFLICT ON CONSTRAINT product_attribute_line_product_a_product_attribute_line_id_fkey DO NOTHING;"
-        #cursor.execute(statement)
-        #conn.commit()
-        con = engine.connect() 
+        
+       
         try:
             con.execute(text("INSERT INTO product_attribute_line_product_attribute_value_rel VALUES (:attribute_line_id, :attribut_value)"),
-               {"attribute_line_id": row[0], "attribut_value": x}) 
+               {"attribute_line_id": row[0], "attribut_value": x}).on_conflict_do_nothing()
         except:
             jml = jml +1
             print "error"
             print jml    
-          
+             
 
 
 #importodoo()
