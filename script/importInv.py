@@ -11,7 +11,7 @@ listOfUkuran=['O','S','M','L','XL','2','3','4','5','6','23','24','25','26','27',
 from dbfread import DBF
 from sqlalchemy import Table, MetaData, create_engine
 from sqlalchemy import text
-
+from sqlalchemy.dialects.postgresql import insert
 engine = create_engine("postgresql://postgres:odoo@localhost/db")
 
 def mclass():
@@ -71,57 +71,68 @@ def depstore():
          conn.commit()          
         
 def importodoo():
+    con = engine.connect() 
     cursor.execute("""SELECT * from invvariant""")
     rows = cursor.fetchall()
+    con.execute(text("delete from product_attribute_line"))
     for row in rows:
         print "   ", row[0]
+        con.execute(text("Insert into product_attribute_line(id,product_tmpl_id,attribute_id,create_uid,write_uid) VALUES(:id,:product_tmpl_id,:attribute_id,:create_uid,:write_uid)")\
+        ,{"id":row[0],"product_tmpl_id":row[0],"attribute_id":1,"create_uid":1,"write_uid":1})\
+       
         statement=" Insert into product_template(id,name,sequence,type,categ_id,uom_id,uom_po_id,responsible_id,tracking,sale_delay,active) "\
         +" values("+row[0]+",'"+row[2]+"',0,'consu',1,1,1,1,'no-message',1,True) "\
         +" ON CONFLICT ON CONSTRAINT product_template_pkey DO UPDATE SET tracking='"+"none"+"',active=True,purchase_ok=True,list_price="+str(row[7])+",sale_ok=True,categ_id=mclass('"+row[10]+"');"
         print row[7]
-        cursor.execute(statement)
-        conn.commit() 
-        statement=" Insert into product_attribute_line(id,product_tmpl_id,attribute_id)"\
-        +" values("+row[0]+","+row[0]+",1)"
-        cursor.execute(statement)
-        conn.commit() 
+        try :
+             cursor.execute(statement)
+             conn.commit() 
+        except:
+             print "error"      
+          
 
 def productvariant():
     print "Product Variant"
     con = engine.connect() 
+    con.execute(text("delete from product_attribute_line_product_attribute_value_rel"))
+   
     cursor.execute("""SELECT * from invproduct_product order by 2,1""")
     rows = cursor.fetchall()
     x=0
     jml=0
-    for row in rows:     
-        #print row[0]
-        statement=" Insert into Product_product(id,product_tmpl_id,barcode,default_code,active) "\
-        +" values("+row[0]+","+row[1]+",'"+row[0]+"','"+row[0]+"',True)"\
-        +" ON CONFLICT ON CONSTRAINT product_product_pkey DO UPDATE SET write_date='2018-12-01 07:52:30.281056',create_date='2018-12-01 07:52:30.281056',create_uid=1,write_uid=1,active=True,default_code='"+row[0]+"'"+",barcode='"+row[0]+"'"
-        x=x+1
-        if x>5 : 
-           x=1 
-        try:
-           cursor.execute(statement)
-           conn.commit()
-        except:
-           print statement    
-           
+   
+    for row in rows:   
+               con.execute(text("INSERT INTO product_attribute_line_product_attribute_value_rel VALUES (:attribute_line_id, :attribut_value)"),\
+               {"attribute_line_id": row[1], "attribut_value": row[5]})
+               #.on_conflict_do_nothing()
+          
+               statement=" Insert into Product_product(id,product_tmpl_id,barcode,default_code,active,create_uid,write_uid) "\
+               +" values("+row[0]+","+row[1]+",'"+row[0]+"','"+row[0]+"',True,1,1)"\
+               +" ON CONFLICT ON CONSTRAINT product_product_pkey DO UPDATE SET write_date='2018-12-01 07:52:30.281056',create_date='2018-12-01 07:52:30.281056',create_uid=1,write_uid=1,active=True,default_code='"+row[0]+"'"+",barcode='"+row[0]+"'"
+               try:
+                  cursor.execute(statement)
+                  conn.commit()
+               except:  
+                  print "Error"
+                  print row[1]
        
               
         
        
-        try:
-            con.execute(text("INSERT INTO product_attribute_line_product_attribute_value_rel VALUES (:attribute_line_id, :attribut_value)"),
-               {"attribute_line_id": row[0], "attribut_value": x}).on_conflict_do_nothing()
-        except:
-            jml = jml +1
-            print "error"
-            print jml    
+       # try:
+       #    
+       # except:
+           
+       #    print "error value rel"
              
+            
+        
+       
+         #conn.commit()
+        
 
 
-#importodoo()
+importodoo()
 productvariant()
 #depstore()
     
